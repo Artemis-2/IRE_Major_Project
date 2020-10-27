@@ -121,4 +121,16 @@ class SummarizationModel(object):
         final_dists = final_dists[0]
         topk_probs, self._topk_ids = tf.nn.top_k(final_dists, hps.batch_size*2) 
         self._topk_log_probs = tf.log(topk_probs)
+
+def _coverage_loss(attn_dists, padding_mask):
+ 
+  coverage = tf.zeros_like(attn_dists[0]) 
+  covlosses = [] 
+  for a in attn_dists:
+    covloss = tf.reduce_sum(tf.minimum(a, coverage), [1]) 
+    covlosses.append(covloss)
+    coverage += a 
+  coverage_loss = _mask_and_avg(covlosses, padding_mask)
+  return coverage_loss
+
     
