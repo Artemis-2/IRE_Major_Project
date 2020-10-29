@@ -6,6 +6,7 @@ import time
 import sys
 import helpers
 from model import SummarizationModel
+from data_loader import Vocab
 
 FLAGS = tf.app.flags.FLAGS
 
