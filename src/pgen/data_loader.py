@@ -1,10 +1,10 @@
-import glob
 import random
 import struct
 import csv
 from tensorflow.core.example import example_pb2
+import glob
 
-
+# <s> and </s> are used in the data files to segment the abstracts into sentences. They don't receive vocab ids.
 SENTENCE_START = '<s>'
 SENTENCE_END = '</s>'
 
@@ -13,13 +13,14 @@ UNKNOWN_TOKEN = '[UNK]' # This has a vocab id, which is used to represent out-of
 START_DECODING = '[START]' # This has a vocab id, which is used at the start of every decoder input sequence
 STOP_DECODING = '[STOP]' # This has a vocab id, which is used at the end of untruncated target sequences
 
+# Note: none of <s>, </s>, [PAD], [UNK], [START], [STOP] should appear in the vocab file.
 
 
 class Vocab(object):
   """Vocabulary class for mapping between words and ids (integers)"""
 
   def __init__(self, vocab_file, max_size):
-    
+   
     self._word_to_id = {}
     self._id_to_word = {}
     self._count = 0 # keeps track of total number of words in the Vocab
@@ -68,7 +69,7 @@ class Vocab(object):
     return self._count
 
   def write_metadata(self, fpath):
-   
+    
     print("Writing word embedding metadata file to %s..." % (fpath))
     with open(fpath, "w") as f:
       fieldnames = ['word']
@@ -79,7 +80,6 @@ class Vocab(object):
 
 def example_generator(data_path, single_pass):
 
- 
   while True:
     filelist = glob.glob(data_path) # get the list of datafiles
     assert filelist, ('Error: Empty filelist at %s' % data_path) # check filelist isn't empty
@@ -101,7 +101,7 @@ def example_generator(data_path, single_pass):
 
 
 def article2ids(article_words, vocab):
-
+  
   ids = []
   oovs = []
   unk_id = vocab.word2id(UNKNOWN_TOKEN)
@@ -118,7 +118,7 @@ def article2ids(article_words, vocab):
 
 
 def abstract2ids(abstract_words, vocab, article_oovs):
-
+  
   ids = []
   unk_id = vocab.word2id(UNKNOWN_TOKEN)
   for w in abstract_words:
@@ -135,7 +135,7 @@ def abstract2ids(abstract_words, vocab, article_oovs):
 
 
 def outputids2words(id_list, vocab, article_oovs):
- 
+
   words = []
   for i in id_list:
     try:
@@ -152,7 +152,7 @@ def outputids2words(id_list, vocab, article_oovs):
 
 
 def abstract2sents(abstract):
-
+  
   cur = 0
   sents = []
   while True:
@@ -166,7 +166,7 @@ def abstract2sents(abstract):
 
 
 def show_art_oovs(article, vocab):
-
+  
   unk_token = vocab.word2id(UNKNOWN_TOKEN)
   words = article.split(' ')
   words = [("__%s__" % w) if vocab.word2id(w)==unk_token else w for w in words]
@@ -175,7 +175,7 @@ def show_art_oovs(article, vocab):
 
 
 def show_abs_oovs(abstract, vocab, article_oovs):
-  
+
   unk_token = vocab.word2id(UNKNOWN_TOKEN)
   words = abstract.split(' ')
   new_words = []
