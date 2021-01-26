@@ -1,1 +1,1 @@
-# IRE_Major_Project
+# IRE_Major_Project - News Summarizer
